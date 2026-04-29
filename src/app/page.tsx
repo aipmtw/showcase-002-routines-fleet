@@ -105,31 +105,31 @@ export default async function FleetPage() {
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         <a
-          href="https://daily.aipm.com.tw"
+          href="https://showcase-003-daily-news.vercel.app"
           className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
         >
           <div className="text-xs text-slate-500 font-mono mb-2">003 · live</div>
           <div className="text-base font-semibold mb-1">Reliability</div>
-          <p className="text-sm text-slate-600">每天 08:00 自己跑。Anthropic / TC AI / HN 三來源,6 則精選。</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">daily.aipm.com.tw →</div>
+          <p className="text-sm text-slate-600">每天早上自己跑。Anthropic / TC AI / HN 三來源,6 則精選。</p>
+          <div className="mt-3 text-xs text-slate-500 font-mono">showcase-003-daily-news.vercel.app →</div>
         </a>
         <a
-          href="https://github.com/aipmtw/showcase-001-genesis-daily-news"
+          href="https://github.com/caotunspring/showcase-001-genesis-daily-news"
           className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
         >
           <div className="text-xs text-slate-500 font-mono mb-2">001-B · receipt</div>
           <div className="text-base font-semibold mb-1">Reproducibility</div>
           <p className="text-sm text-slate-600">build.md walked 3× on 2026-04-26 · cold 5m14s · warm 3m38s.</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">github.com/aipmtw →</div>
+          <div className="mt-3 text-xs text-slate-500 font-mono">github.com/caotunspring →</div>
         </a>
         <a
-          href="https://daily-mfg.aipm.com.tw"
+          href="https://showcase-004-daily-mfg-news.vercel.app"
           className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
         >
           <div className="text-xs text-slate-500 font-mono mb-2">004 · sibling</div>
           <div className="text-base font-semibold mb-1">Same architecture · different vertical</div>
           <p className="text-sm text-slate-600">半導體供應鏈每日新聞,30 分鐘從 003 fork 出來。</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">daily-mfg.aipm.com.tw →</div>
+          <div className="mt-3 text-xs text-slate-500 font-mono">showcase-004-daily-mfg-news.vercel.app →</div>
         </a>
       </section>
     </div>
