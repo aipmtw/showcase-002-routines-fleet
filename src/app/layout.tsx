@@ -22,7 +22,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 Showcase
                 <span className="text-slate-500 font-normal text-lg md:text-xl ml-3">· AIA × Claude Code</span>
               </h1>
-              <nav className="flex gap-6 text-sm font-semibold text-slate-600">
+              <nav className="flex gap-5 text-sm font-semibold text-slate-600">
+                <a href="https://github.com/caotunspring/showcase-001-genesis-daily-news" className="hover:text-slate-900 hover:underline underline-offset-4" title="001-B · build.md (reproduction recipe · cold 5m14s / warm 3m38s)">build.md</a>
                 <a href="https://github.com/aipmtw/showcase-002-routines-fleet" className="hover:text-slate-900 hover:underline underline-offset-4">source</a>
               </nav>
             </div>

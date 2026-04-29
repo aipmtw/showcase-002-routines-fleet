@@ -45,14 +45,14 @@ export const PROJECT_DIRECTORY: Record<
 > = {
   "showcase-003-daily-news": {
     displayName: "Daily News · AI coding",
-    homeUrl: "https://showcase-003-daily-news.vercel.app",
-    runUrlPrefix: "https://showcase-003-daily-news.vercel.app/runs/",
+    homeUrl: "https://daily.aipm.com.tw",
+    runUrlPrefix: "https://daily.aipm.com.tw/runs/",
     tagline: "Anthropic / TechCrunch AI / HN",
   },
   "showcase-004-daily-mfg-news": {
     displayName: "Daily News · 半導體供應鏈",
-    homeUrl: "https://showcase-004-daily-mfg-news.vercel.app",
-    runUrlPrefix: "https://showcase-004-daily-mfg-news.vercel.app/runs/",
+    homeUrl: "https://daily-mfg.aipm.com.tw",
+    runUrlPrefix: "https://daily-mfg.aipm.com.tw/runs/",
     tagline: "udn-money / cna-tech / technews-tw",
   },
 };

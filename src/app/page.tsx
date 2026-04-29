@@ -94,27 +94,37 @@ export default async function FleetPage() {
         </div>
       )}
 
-      <section className="space-y-6 mb-12">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
         {projects.map((project) => {
           const meta = PROJECT_DIRECTORY[project];
           const projectRuns = byProject[project] ?? [];
           const { slots, missing } = buildTimeline(projectRuns);
+          // strip the protocol + path for the audit-trail label (per Hybrid URL pattern)
+          const vercelHost = `${project}.vercel.app`;
           return (
-            <div key={project} className="rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors">
-              <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-                <div>
-                  <a href={meta.homeUrl} className="text-lg font-semibold text-slate-900 hover:underline underline-offset-4">
+            <div
+              key={project}
+              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
+            >
+              <div className="mb-4">
+                <div className="flex items-baseline justify-between flex-wrap gap-x-3 gap-y-1 mb-1">
+                  <a
+                    href={meta.homeUrl}
+                    className="text-xl font-semibold text-slate-900 hover:underline underline-offset-4 decoration-2"
+                  >
                     {meta.displayName}
                   </a>
-                  <span className="ml-3 text-xs text-slate-500 font-mono">{project}</span>
+                  <span className="text-[11px] text-slate-400 font-mono uppercase tracking-wide">
+                    {project}
+                  </span>
                 </div>
                 <div className="text-xs text-slate-500">{meta.tagline}</div>
               </div>
 
               {slots.length === 0 ? (
-                <p className="text-sm text-slate-400 italic">No runs yet — waiting for first cron.</p>
+                <p className="text-sm text-slate-400 italic py-4">No runs yet — waiting for first cron.</p>
               ) : (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 py-2">
                   {slots.map(({ date, run }) =>
                     run ? (
                       <a
@@ -134,49 +144,28 @@ export default async function FleetPage() {
                 </div>
               )}
 
-              <div className="mt-4 flex gap-4 text-xs text-slate-500 font-mono items-center flex-wrap">
-                <span>{projectRuns.length} runs</span>
-                {missing > 0 && (
-                  <span className="text-amber-700" title="days with no routine_runs row in this window">
-                    · {missing} gap{missing === 1 ? "" : "s"}
-                  </span>
-                )}
-                <a href={meta.homeUrl} className="hover:underline">→ today</a>
-                <a href={`${meta.runUrlPrefix}`} className="hover:underline">→ all runs</a>
+              <div className="mt-4 flex items-center justify-between gap-3 text-xs font-mono text-slate-500">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-slate-700">{projectRuns.length} runs</span>
+                  {missing > 0 && (
+                    <span className="text-amber-700" title="days with no routine_runs row in this window">
+                      · {missing} gap{missing === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <a href={meta.homeUrl} className="hover:underline hover:text-slate-900 transition-colors">→ today</a>
+                  <a href={`${meta.runUrlPrefix}`} className="hover:underline hover:text-slate-900 transition-colors">→ all runs</a>
+                </div>
+              </div>
+
+              {/* audit-trail label · per Hybrid URL pattern: link goes to clean subdomain, label shows actual vercel.app */}
+              <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400 font-mono">
+                served from <span className="text-slate-500">{vercelHost}</span>
               </div>
             </div>
           );
         })}
-      </section>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        <a
-          href="https://showcase-003-daily-news.vercel.app"
-          className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
-        >
-          <div className="text-xs text-slate-500 font-mono mb-2">003 · live</div>
-          <div className="text-base font-semibold mb-1">Reliability</div>
-          <p className="text-sm text-slate-600">每天早上自己跑。Anthropic / TC AI / HN 三來源,6 則精選。</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">showcase-003-daily-news.vercel.app →</div>
-        </a>
-        <a
-          href="https://github.com/caotunspring/showcase-001-genesis-daily-news"
-          className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
-        >
-          <div className="text-xs text-slate-500 font-mono mb-2">001-B · receipt</div>
-          <div className="text-base font-semibold mb-1">Reproducibility</div>
-          <p className="text-sm text-slate-600">build.md walked 3× on 2026-04-26 · cold 5m14s · warm 3m38s.</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">github.com/caotunspring →</div>
-        </a>
-        <a
-          href="https://showcase-004-daily-mfg-news.vercel.app"
-          className="rounded-xl border border-slate-200 p-6 hover:border-slate-900 transition-colors"
-        >
-          <div className="text-xs text-slate-500 font-mono mb-2">004 · sibling</div>
-          <div className="text-base font-semibold mb-1">Same architecture · different vertical</div>
-          <p className="text-sm text-slate-600">半導體供應鏈每日新聞,30 分鐘從 003 fork 出來。</p>
-          <div className="mt-3 text-xs text-slate-500 font-mono">showcase-004-daily-mfg-news.vercel.app →</div>
-        </a>
       </section>
     </div>
   );
