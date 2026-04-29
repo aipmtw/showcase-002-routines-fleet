@@ -5,6 +5,26 @@ export const revalidate = 60;
 
 const WINDOW_DAYS = 30;
 
+// Build a calendar of dates from min(run) → today, marking each slot as
+// either a real run or a gap. Gaps are missed cron triggers — they tell
+// the truth about reliability and are visualized as hollow grey squares.
+function buildTimeline(runs: RoutineRun[]) {
+  if (runs.length === 0) return { slots: [] as Array<{ date: string; run: RoutineRun | null }>, missing: 0 };
+  const sorted = [...runs].sort((a, b) => a.news_date.localeCompare(b.news_date));
+  const startDate = new Date(`${sorted[0].news_date}T00:00:00Z`);
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const dayMs = 86_400_000;
+  const slots: Array<{ date: string; run: RoutineRun | null }> = [];
+  for (let t = startDate.getTime(); t <= today.getTime(); t += dayMs) {
+    const iso = new Date(t).toISOString().slice(0, 10);
+    const run = sorted.find((r) => r.news_date === iso) ?? null;
+    slots.push({ date: iso, run });
+  }
+  const missing = slots.filter((s) => !s.run).length;
+  return { slots, missing };
+}
+
 export default async function FleetPage() {
   const supabase = supabasePublic();
 
@@ -30,6 +50,7 @@ export default async function FleetPage() {
     if (byProject[r.project]) byProject[r.project].push(r);
   }
 
+  const today = new Date().toISOString().slice(0, 10);
   const summary = {
     projects: projects.length,
     runs30d: runs.length,
@@ -40,17 +61,30 @@ export default async function FleetPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-8 py-10">
-      <section className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">
+      <section className="mb-8">
+        <div className="text-xs font-mono text-slate-500 mb-2">Today · {today} · Asia/Taipei</div>
+        <h1 className="text-4xl font-bold tracking-tight mb-3 text-slate-900">
           看得見的 production scheduler
         </h1>
-        <p className="text-slate-600 max-w-3xl">
-          {summary.projects} 個 showcase · 過去 {WINDOW_DAYS} 天 {summary.runs30d} 次 routine run ·{" "}
-          <span className="text-emerald-700 font-semibold">{summary.succeeded} succeeded</span>
-          {summary.degraded > 0 && <> · <span className="text-amber-700 font-semibold">{summary.degraded} degraded</span></>}
-          {summary.failed > 0 && <> · <span className="text-rose-700 font-semibold">{summary.failed} failed</span></>}
-          . 每個圓點是一次 Claude Code Routine 觸發,點下去看當次的所有 LLM 決策。
+        <p className="text-base text-slate-700 max-w-3xl leading-relaxed">
+          {summary.projects} 個 Claude Code Routine 每天早上各自跑一次,寫入同一個 Supabase。
+          底下每一格 = 該專案的某一天運行;<span className="text-emerald-700 font-semibold">綠色</span> 是成功,
+          <span className="text-slate-400 font-semibold">空白</span> 是當天 cron 沒打中。
+          點任一格進 <code className="font-mono text-xs bg-slate-100 px-1 rounded">/runs/[id]</code> 看當次每一個 LLM 決策的 timestamp。
         </p>
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <span className="text-slate-700">過去 {WINDOW_DAYS} 天 <span className="font-semibold">{summary.runs30d}</span> 次</span>
+          <span className="text-emerald-700"><span className="font-semibold">{summary.succeeded}</span> succeeded</span>
+          {summary.degraded > 0 && <span className="text-amber-700"><span className="font-semibold">{summary.degraded}</span> degraded</span>}
+          {summary.failed > 0 && <span className="text-rose-700"><span className="font-semibold">{summary.failed}</span> failed</span>}
+        </div>
+        {/* legend */}
+        <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
+          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-emerald-500" /> succeeded</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-amber-500" /> degraded</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-rose-500" /> failed</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm border border-dashed border-slate-300 bg-white" /> gap (no run)</span>
+        </div>
       </section>
 
       {!configured && (
@@ -60,14 +94,13 @@ export default async function FleetPage() {
         </div>
       )}
 
-      <section className="space-y-8 mb-12">
+      <section className="space-y-6 mb-12">
         {projects.map((project) => {
           const meta = PROJECT_DIRECTORY[project];
           const projectRuns = byProject[project] ?? [];
-          // chronological left → right
-          const ordered = [...projectRuns].sort((a, b) => a.started_at.localeCompare(b.started_at));
+          const { slots, missing } = buildTimeline(projectRuns);
           return (
-            <div key={project} className="rounded-xl border border-slate-200 p-6">
+            <div key={project} className="rounded-xl border border-slate-200 p-6 hover:border-slate-300 transition-colors">
               <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
                 <div>
                   <a href={meta.homeUrl} className="text-lg font-semibold text-slate-900 hover:underline underline-offset-4">
@@ -78,23 +111,36 @@ export default async function FleetPage() {
                 <div className="text-xs text-slate-500">{meta.tagline}</div>
               </div>
 
-              {ordered.length === 0 ? (
-                <p className="text-sm text-slate-400 italic">No runs in the last {WINDOW_DAYS} days.</p>
+              {slots.length === 0 ? (
+                <p className="text-sm text-slate-400 italic">No runs yet — waiting for first cron.</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
-                  {ordered.map((r) => (
-                    <a
-                      key={r.id}
-                      href={`${meta.runUrlPrefix}${r.run_id}`}
-                      title={`${r.news_date} · ${r.status} · ${r.items_produced ?? 0} items · ${r.run_id}`}
-                      className={`inline-block w-3.5 h-3.5 rounded-sm transition-transform hover:scale-150 ${dotColor(r.status)}`}
-                    />
-                  ))}
+                  {slots.map(({ date, run }) =>
+                    run ? (
+                      <a
+                        key={run.id}
+                        href={`${meta.runUrlPrefix}${run.run_id}`}
+                        title={`${run.news_date} · ${run.status} · ${run.items_produced ?? 0} items · ${run.run_id}`}
+                        className={`inline-block w-4 h-4 rounded-sm transition-transform hover:scale-150 ${dotColor(run.status)}`}
+                      />
+                    ) : (
+                      <span
+                        key={`gap-${date}`}
+                        title={`${date} · no run (cron miss or pre-launch)`}
+                        className="inline-block w-4 h-4 rounded-sm border border-dashed border-slate-300 bg-white"
+                      />
+                    ),
+                  )}
                 </div>
               )}
 
-              <div className="mt-4 flex gap-4 text-xs text-slate-500 font-mono">
-                <span>{ordered.length} runs</span>
+              <div className="mt-4 flex gap-4 text-xs text-slate-500 font-mono items-center flex-wrap">
+                <span>{projectRuns.length} runs</span>
+                {missing > 0 && (
+                  <span className="text-amber-700" title="days with no routine_runs row in this window">
+                    · {missing} gap{missing === 1 ? "" : "s"}
+                  </span>
+                )}
                 <a href={meta.homeUrl} className="hover:underline">→ today</a>
                 <a href={`${meta.runUrlPrefix}`} className="hover:underline">→ all runs</a>
               </div>
