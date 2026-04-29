@@ -60,41 +60,38 @@ export default async function FleetPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-10">
-      <section className="mb-8">
-        <div className="text-xs font-mono text-slate-500 mb-2">Today · {today} · Asia/Taipei</div>
-        <h1 className="text-4xl font-bold tracking-tight mb-3 text-slate-900">
-          看得見的 production scheduler
-        </h1>
-        <p className="text-base text-slate-700 max-w-3xl leading-relaxed">
-          {summary.projects} 個 Claude Code Routine 每天早上各自跑一次,寫入同一個 Supabase。
-          底下每一格 = 該專案的某一天運行;<span className="text-emerald-700 font-semibold">綠色</span> 是成功,
-          <span className="text-slate-400 font-semibold">空白</span> 是當天 cron 沒打中。
-          點任一格進 <code className="font-mono text-xs bg-slate-100 px-1 rounded">/runs/[id]</code> 看當次每一個 LLM 決策的 timestamp。
+    <div className="max-w-screen-2xl mx-auto px-8 md:px-12 py-12 md:py-14">
+      <section className="mb-10">
+        <div className="text-sm md:text-base font-mono font-semibold text-slate-500 mb-3 tracking-wide">Today · {today} · Asia/Taipei</div>
+        <p className="text-2xl md:text-3xl text-slate-800 max-w-5xl leading-snug font-medium">
+          看得見的 <span className="font-bold text-slate-900">production scheduler</span> — {summary.projects} 個 Claude Code Routine 每天早上各自跑一次,寫入同一個 Supabase;每一格 = 該專案的某一天運行,<span className="text-emerald-700 font-bold">綠色</span> 成功,<span className="text-slate-400 font-bold">空白</span> 當天 cron 沒打中。
         </p>
-        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-          <span className="text-slate-700">過去 {WINDOW_DAYS} 天 <span className="font-semibold">{summary.runs30d}</span> 次</span>
-          <span className="text-emerald-700"><span className="font-semibold">{summary.succeeded}</span> succeeded</span>
-          {summary.degraded > 0 && <span className="text-amber-700"><span className="font-semibold">{summary.degraded}</span> degraded</span>}
-          {summary.failed > 0 && <span className="text-rose-700"><span className="font-semibold">{summary.failed}</span> failed</span>}
+        <p className="mt-4 text-base md:text-lg text-slate-600 max-w-4xl leading-relaxed">
+          點任一格進 <code className="font-mono text-sm md:text-base bg-slate-100 px-2 py-0.5 rounded">/runs/[id]</code> 看當次每一個 LLM 決策的 timestamp。
+        </p>
+        <div className="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-base md:text-lg">
+          <span className="text-slate-800">過去 {WINDOW_DAYS} 天 <span className="font-bold text-2xl text-slate-900">{summary.runs30d}</span> 次</span>
+          <span className="text-emerald-700"><span className="font-bold text-2xl">{summary.succeeded}</span> succeeded</span>
+          {summary.degraded > 0 && <span className="text-amber-700"><span className="font-bold text-2xl">{summary.degraded}</span> degraded</span>}
+          {summary.failed > 0 && <span className="text-rose-700"><span className="font-bold text-2xl">{summary.failed}</span> failed</span>}
         </div>
         {/* legend */}
-        <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-emerald-500" /> succeeded</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-amber-500" /> degraded</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm bg-rose-500" /> failed</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-3 rounded-sm border border-dashed border-slate-300 bg-white" /> gap (no run)</span>
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm md:text-base text-slate-600">
+          <span className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm bg-emerald-500" /> succeeded</span>
+          <span className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm bg-amber-500" /> degraded</span>
+          <span className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm bg-rose-500" /> failed</span>
+          <span className="flex items-center gap-2"><span className="inline-block w-4 h-4 rounded-sm border-2 border-dashed border-slate-300 bg-white" /> gap (no run)</span>
         </div>
       </section>
 
       {!configured && (
-        <div className="mb-8 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="mb-10 rounded-lg border border-amber-300 bg-amber-50 px-5 py-4 text-base text-amber-900">
           Supabase env not configured yet. Push <code className="font-mono">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
           <code className="font-mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to see live data.
         </div>
       )}
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-14">
         {projects.map((project) => {
           const meta = PROJECT_DIRECTORY[project];
           const projectRuns = byProject[project] ?? [];
@@ -104,13 +101,13 @@ export default async function FleetPage() {
           return (
             <div
               key={project}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
+              className="group rounded-2xl border-2 border-slate-200 bg-white p-7 md:p-8 shadow-sm hover:shadow-lg hover:border-slate-400 transition-all"
             >
-              <div className="mb-4">
+              <div className="mb-5">
                 <div className="flex items-baseline justify-between flex-wrap gap-x-3 gap-y-1 mb-1">
                   <a
                     href={meta.homeUrl}
-                    className="text-xl font-semibold text-slate-900 hover:underline underline-offset-4 decoration-2"
+                    className="text-2xl md:text-3xl font-bold text-slate-900 hover:underline underline-offset-4 decoration-2"
                   >
                     {meta.displayName}
                   </a>
@@ -118,50 +115,50 @@ export default async function FleetPage() {
                     {project}
                   </span>
                 </div>
-                <div className="text-xs text-slate-500">{meta.tagline}</div>
+                <div className="text-sm md:text-base text-slate-600">{meta.tagline}</div>
               </div>
 
               {slots.length === 0 ? (
-                <p className="text-sm text-slate-400 italic py-4">No runs yet — waiting for first cron.</p>
+                <p className="text-base text-slate-400 italic py-5">No runs yet — waiting for first cron.</p>
               ) : (
-                <div className="flex flex-wrap gap-1.5 py-2">
+                <div className="flex flex-wrap gap-2 py-3">
                   {slots.map(({ date, run }) =>
                     run ? (
                       <a
                         key={run.id}
                         href={`${meta.runUrlPrefix}${run.run_id}`}
                         title={`${run.news_date} · ${run.status} · ${run.items_produced ?? 0} items · ${run.run_id}`}
-                        className={`inline-block w-4 h-4 rounded-sm transition-transform hover:scale-150 ${dotColor(run.status)}`}
+                        className={`inline-block w-6 h-6 rounded-md transition-transform hover:scale-150 ${dotColor(run.status)}`}
                       />
                     ) : (
                       <span
                         key={`gap-${date}`}
                         title={`${date} · no run (cron miss or pre-launch)`}
-                        className="inline-block w-4 h-4 rounded-sm border border-dashed border-slate-300 bg-white"
+                        className="inline-block w-6 h-6 rounded-md border-2 border-dashed border-slate-300 bg-white"
                       />
                     ),
                   )}
                 </div>
               )}
 
-              <div className="mt-4 flex items-center justify-between gap-3 text-xs font-mono text-slate-500">
+              <div className="mt-5 flex items-center justify-between gap-3 text-sm md:text-base font-mono text-slate-600">
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-slate-700">{projectRuns.length} runs</span>
+                  <span className="font-bold text-slate-900">{projectRuns.length} runs</span>
                   {missing > 0 && (
                     <span className="text-amber-700" title="days with no routine_runs row in this window">
                       · {missing} gap{missing === 1 ? "" : "s"}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <a href={meta.homeUrl} className="hover:underline hover:text-slate-900 transition-colors">→ today</a>
                   <a href={`${meta.runUrlPrefix}`} className="hover:underline hover:text-slate-900 transition-colors">→ all runs</a>
                 </div>
               </div>
 
               {/* audit-trail label · per Hybrid URL pattern: link goes to clean subdomain, label shows actual vercel.app */}
-              <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400 font-mono">
-                served from <span className="text-slate-500">{vercelHost}</span>
+              <div className="mt-4 pt-4 border-t border-slate-100 text-xs md:text-sm text-slate-400 font-mono">
+                served from <span className="text-slate-600">{vercelHost}</span>
               </div>
             </div>
           );
